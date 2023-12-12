@@ -3,6 +3,7 @@ package native
 import (
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/PolyAI-LDN/ari/v6"
@@ -509,9 +510,15 @@ func (c *Channel) Redirect(key *ari.Key, endpoint string) (err error) {
 		Endpoint: endpoint,
 	}
 
-	resp := make(map[string]string)
-
-	err = c.client.post("/channels/"+key.ID+"/redirect", &resp, &req)
-	fmt.Printf("received redirect response: %v", resp)
+	resp, err := c.client.makeGenericRequest("POST", "/channels/"+key.ID+"/redirect", &req, "application/json")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("cannot read response body: %w", err)
+	}
+	fmt.Printf("received redirect response: %v", string(bytes))
 	return
 }
