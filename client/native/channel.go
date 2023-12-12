@@ -508,5 +508,10 @@ func (c *Channel) Redirect(key *ari.Key, endpoint string) (err error) {
 	}{
 		Endpoint: endpoint,
 	}
-	return c.client.post("/channels/"+key.ID+"/redirect", nil, &req)
+
+	resp := make(map[string]string)
+
+	err = c.client.post("/channels/"+key.ID+"/redirect", &resp, &req)
+	fmt.Printf("received redirect response: %v", resp)
+	return
 }
