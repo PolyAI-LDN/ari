@@ -510,7 +510,7 @@ func (c *Channel) Redirect(key *ari.Key, endpoint string) (err error) {
 		Endpoint: endpoint,
 	}
 
-	resp, err := c.client.makeGenericRequest("POST", "/channels/"+key.ID+"/redirect", &req, "application/json")
+	resp, err := c.client.makeGenericRequest("POST", c.client.Options.URL+"/channels/"+key.ID+"/redirect", &req, "application/json")
 	if err != nil {
 		return err
 	}
