@@ -19,7 +19,13 @@ func (t *TextMessage) Send(from, tech, resource, body string, vars map[string]st
 		vars = map[string]string{}
 	}
 
-	return t.client.put("/endpoints/"+tech+"/"+resource+"/sendMessage?"+v.Encode(), nil, &vars)
+	data := struct {
+		Variables map[string]string `json:"variables"`
+	}{
+		Variables: vars,
+	}
+
+	return t.client.put("/endpoints/"+tech+"/"+resource+"/sendMessage?"+v.Encode(), nil, &data)
 }
 
 // SendByURI sends a text message to an endpoint by free-form URI (rather than tech/resource)
@@ -35,5 +41,11 @@ func (t *TextMessage) SendByURI(from, to, body string, vars map[string]string) e
 		vars = map[string]string{}
 	}
 
-	return t.client.put("/endpoints/sendMessage?"+v.Encode(), nil, &vars)
+	data := struct {
+		Variables map[string]string `json:"variables"`
+	}{
+		Variables: vars,
+	}
+
+	return t.client.put("/endpoints/sendMessage?"+v.Encode(), nil, &data)
 }
