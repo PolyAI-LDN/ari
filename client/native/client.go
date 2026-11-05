@@ -144,8 +144,9 @@ func New(opts *Options) *Client {
 	}
 
 	return &Client{
-		appName: opts.Application,
-		Options: opts,
+		appName:    opts.Application,
+		Options:    opts,
+		httpClient: http.Client{Transport: newTransport()},
 	}
 }
 
