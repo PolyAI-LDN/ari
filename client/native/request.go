@@ -11,8 +11,12 @@ import (
 )
 
 // MaxIdleConnections is the maximum number of idle web client
-// connections to maintain.
+// connections to maintain. It is read when a Client is created.
 var MaxIdleConnections = 20
+
+// IdleConnTimeout is how long an idle connection is kept; below Asterisk's
+// default http.conf session_keep_alive (15s) so we never reuse one it is closing.
+var IdleConnTimeout = 10 * time.Second
 
 // RequestTimeout describes the maximum amount of time to wait
 // for a response to any request.
@@ -142,6 +146,17 @@ func (c *Client) makeRequest(method, url string, resp interface{}, req interface
 	}
 
 	return maybeRequestError(ret)
+}
+
+// newTransport returns a transport that keeps up to MaxIdleConnections idle
+// connections to Asterisk; http.DefaultTransport keeps only 2 per host.
+func newTransport() *http.Transport {
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.MaxIdleConns = MaxIdleConnections
+	t.MaxIdleConnsPerHost = MaxIdleConnections
+	t.IdleConnTimeout = IdleConnTimeout
+
+	return t
 }
 
 func structToRequestBody(req interface{}) (io.Reader, error) {
